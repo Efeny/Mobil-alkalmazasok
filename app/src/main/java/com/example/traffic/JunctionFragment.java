@@ -116,7 +116,7 @@ import static com.android.volley.VolleyLog.TAG;
 public class JunctionFragment extends Fragment implements OnMapReadyCallback {
     MapView mMapView;
     private GoogleMap mMap;
-    PlaceAutocompleteFragment place;
+    SupportPlaceAutocompleteFragment place;
     TextView txt;
 
     @Nullable
@@ -126,13 +126,23 @@ public class JunctionFragment extends Fragment implements OnMapReadyCallback {
         mMapView = mView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
 
-        txt=txt.findViewById(R.id.txtInfo);
-        SupportMapFragment mapFragment = (SupportMapFragment)getActivity().getSupportFragmentManager()
-                .findFragmentById(R.id.mapView);
-        mapFragment.getMapAsync(this);
-        place = (PlaceAutocompleteFragment)getActivity().getFragmentManager().findFragmentById(R.id.place_autocomplete);
+        if (!Places.isInitialized()) {
+            Places.initialize(getActivity().getApplicationContext(), "AIzaSyA6PaKOfMziUJOqPyxyDLOpfodK60OIil4");
+        }
+        PlacesClient placesClient = Places.createClient(getActivity());
 
-        place.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+        try {
+            MapsInitializer.initialize(getActivity().getApplicationContext());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        txt = mView.findViewById(R.id.txtInfo);
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getChildFragmentManager().findFragmentById(R.id.place_autocomplete);
+
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
                 AddPlace(place, 1);
@@ -142,6 +152,10 @@ public class JunctionFragment extends Fragment implements OnMapReadyCallback {
             public void onError(Status status) {
             }
         });
+
+        //SupportMapFragment mapFragment = (SupportMapFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.mapView);
+        mMapView.getMapAsync(this);
+
         return mView;
     }
 
@@ -183,10 +197,5 @@ public class JunctionFragment extends Fragment implements OnMapReadyCallback {
             });
         }
     }
-
-    private class PlaceAutocompleteFragment {
-        public void setOnPlaceSelectedListener(PlaceSelectionListener placeSelectionListener) {
-        }
-    }
-    }
+}
 
