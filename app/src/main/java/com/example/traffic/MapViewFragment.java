@@ -1,14 +1,18 @@
 package com.example.traffic;
 
 import android.content.Context;
+import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -17,6 +21,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
@@ -26,6 +31,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
     MapView mMapView;
     private GoogleMap googleMap;
+    View mView;
     Button buttonMeasurement;
 
     double latitude;
@@ -37,7 +43,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // inflat and return the layout
-        View mView = inflater.inflate(R.layout.fragment_measurement, container,false);
+        mView = inflater.inflate(R.layout.fragment_measurement, container,false);
         mMapView = (MapView) mView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
 
@@ -53,7 +59,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         //SupportMapFragment mapFragment = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.frag));
         //mapFragment.getMapAsync(this);
 
-        addMarker(mView);
+        startMeasurement(mView,googleMap);
 
         // Perform any camera updates here
         return mView;
@@ -84,8 +90,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         mMapView.onLowMemory();
     }
 
-    @Override
-    public void onMapReady(GoogleMap map) {
+
+    public void onMapReady(GoogleMap map, Place place) {
+        JunctionFragment jf=new JunctionFragment();
+        TextView txt=mView.findViewById(R.id.txtInfo);
         //DO WHATEVER YOU WANT WITH GOOGLEMAP
         // latitude and longitude
         //double latitude = 47.187104;
@@ -97,7 +105,12 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         // Changing marker icon
        // marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
 
-        googleMap=map;
+        map=googleMap;
+
+        for (int i=0; i<=jf.markerList.size();i++){
+            map.addMarker(jf.markerList.get(i));
+        }
+
 
         // adding marker
        // googleMap.addMarker(marker);
@@ -138,10 +151,21 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
-    public void addMarker(View mView)
+    public void startMeasurement(View mView, GoogleMap googleMap)
     {
-
-        if(marker == null){
+        final String[] markerTexT = new String[1];
+        MainActivity main=new MainActivity();
+        GoogleMap mMap=googleMap;
+        final boolean markerIsAssigned=false;
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                markerTexT[0] =(marker.getTitle().toString());
+                return markerIsAssigned==true;
+            }
+        });
+        if(markerIsAssigned==false)
+        {
             buttonMeasurement = mView.findViewById(R.id.buttonMeasurement);
             buttonMeasurement.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -154,15 +178,13 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                 }
             });
         }
+        else{
+            main.changeActivity(mView);
+        }
     }
-    /*if (marker==null)
-                {
-                    Context context = getApplicationContext();
-                    CharSequence text = "Hello toast!";
-                    int duration = Toast.LENGTH_SHORT;
 
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
-                }*/
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
 
+    }
 }

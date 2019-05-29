@@ -86,12 +86,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment;
@@ -100,7 +98,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -111,20 +108,22 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-
-import static com.android.volley.VolleyLog.TAG;
+import java.util.List;
 
 public class JunctionFragment extends Fragment implements OnMapReadyCallback {
     MapView mMapView;
     private GoogleMap mMap;
     SupportPlaceAutocompleteFragment place;
     TextView txt;
+    View mView;
+    List<MarkerOptions> markerList= new ArrayList<MarkerOptions>();
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View mView = inflater.inflate(R.layout.fragment_junction, container, false);
+        mView = inflater.inflate(R.layout.fragment_junction, container, false);
         mMapView = mView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
 
@@ -163,17 +162,20 @@ public class JunctionFragment extends Fragment implements OnMapReadyCallback {
 
 
     public void AddPlace(Place place, int pno) {
+        txt=mView.findViewById(R.id.txtInfo);
         try {
             if (mMap == null) {
-                //Toast.makeText(JunctionFragment.this, "Please check your API key for Google Places SDK and your internet conneciton", Toast.LENGTH_LONG).show();
+
             } else {
 
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 4));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 16));
 
                 mMap.addMarker(new MarkerOptions().position(place.getLatLng())
-                        .title("Name:" + place.getName() + ". Address:" + place.getAddress()));
+                        .title(place.getName()));
 
-                txt.setText("Name:" + place.getName() + ". Address:" + place.getAddress());
+                markerList.add(new MarkerOptions().position(place.getLatLng()));
+
+                txt.setText("Name:" + place.getName() + "\nAddress:" + place.getAddress());
 
             }
         } catch (Exception ex) {
@@ -186,6 +188,7 @@ public class JunctionFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        final String[] markerTexT = new String[1];
         mMap = googleMap;
         CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(47.187104, 18.412595)).zoom(12).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
@@ -199,7 +202,7 @@ public class JunctionFragment extends Fragment implements OnMapReadyCallback {
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
-                    txt.setText(marker.getTitle().toString() + " Lat:" + marker.getPosition().latitude + " Long:" + marker.getPosition().longitude);
+                    markerTexT[0] =(marker.getTitle().toString());
                     return false;
                 }
             });
