@@ -82,10 +82,13 @@ public class JunctionFragment extends Fragment implements OnMapReadyCallback {
 }
 */
 
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -119,6 +122,7 @@ public class JunctionFragment extends Fragment implements OnMapReadyCallback {
     TextView txt;
     View mView;
     List<MarkerOptions> markerList= new ArrayList<MarkerOptions>();
+    String TAG = this.getClass().toString();
 
     @Nullable
     @Override
@@ -127,11 +131,19 @@ public class JunctionFragment extends Fragment implements OnMapReadyCallback {
         mMapView = mView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
 
-        if (!Places.isInitialized()) {
-            Places.initialize(getActivity().getApplicationContext(), "AIzaSyA6PaKOfMziUJOqPyxyDLOpfodK60OIil4");
+        try {
+            ApplicationInfo ai = getActivity().getPackageManager().getApplicationInfo(getActivity().getPackageName(), PackageManager.GET_META_DATA);
+            Bundle bundle = ai.metaData;
+            String myApiKey = bundle.getString("com.google.android.geo.API_KEY");
+            if (!Places.isInitialized()) {
+                Places.initialize(getActivity().getApplicationContext(), myApiKey);
+            }
+            PlacesClient placesClient = Places.createClient(getActivity());
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Failed to load meta-data, NameNotFound: " + e.getMessage());
+        } catch (NullPointerException e) {
+            Log.e(TAG, "Failed to load meta-data, NullPointer: " + e.getMessage());
         }
-        PlacesClient placesClient = Places.createClient(getActivity());
-
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
         } catch (Exception e) {

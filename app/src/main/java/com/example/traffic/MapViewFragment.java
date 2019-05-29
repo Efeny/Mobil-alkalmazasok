@@ -44,7 +44,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                              Bundle savedInstanceState) {
         // inflat and return the layout
         mView = inflater.inflate(R.layout.fragment_measurement, container,false);
-        mMapView = (MapView) mView.findViewById(R.id.mapView);
+        mMapView = mView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
 
         mMapView.onResume();// needed to get the map to display immediately
@@ -58,8 +58,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         mMapView.getMapAsync(this);
         //SupportMapFragment mapFragment = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.frag));
         //mapFragment.getMapAsync(this);
-
-        startMeasurement(mView,googleMap);
 
         // Perform any camera updates here
         return mView;
@@ -90,8 +88,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         mMapView.onLowMemory();
     }
 
-
-    public void onMapReady(GoogleMap map, Place place) {
+    @Override
+    public void onMapReady(GoogleMap map) {
         JunctionFragment jf=new JunctionFragment();
         TextView txt=mView.findViewById(R.id.txtInfo);
         //DO WHATEVER YOU WANT WITH GOOGLEMAP
@@ -105,23 +103,23 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         // Changing marker icon
        // marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
 
-        map=googleMap;
+        googleMap = map;
 
-        for (int i=0; i<=jf.markerList.size();i++){
+        /*for (int i=0; i<=jf.markerList.size();i++){
             map.addMarker(jf.markerList.get(i));
-        }
+        }*/
 
 
         // adding marker
        // googleMap.addMarker(marker);
         CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(47.187104, 18.412595)).zoom(12).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         //map.setMyLocationEnabled(true);
-        map.setTrafficEnabled(false);
-        map.setIndoorEnabled(true);
-        map.setBuildingsEnabled(true);
-        map.getUiSettings().setZoomControlsEnabled(true);
+        googleMap.setTrafficEnabled(false);
+        googleMap.setIndoorEnabled(true);
+        googleMap.setBuildingsEnabled(true);
+        googleMap.getUiSettings().setZoomControlsEnabled(true);
         // Setting a click event handler for the map
         googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
 
@@ -146,18 +144,18 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
                 // Placing a marker on the touched position
                 googleMap.addMarker(markerOptions);
+                startMeasurement(mView);
             }
         });
     }
 
 
-    public void startMeasurement(View mView, GoogleMap googleMap)
+    public void startMeasurement(View mView)
     {
         final String[] markerTexT = new String[1];
         MainActivity main=new MainActivity();
-        GoogleMap mMap=googleMap;
         final boolean markerIsAssigned=false;
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 markerTexT[0] =(marker.getTitle().toString());
@@ -181,10 +179,5 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         else{
             main.changeActivity(mView);
         }
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-
     }
 }
