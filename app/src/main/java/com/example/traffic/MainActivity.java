@@ -1,5 +1,6 @@
 package com.example.traffic;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -10,6 +11,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
@@ -25,7 +28,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-                mFragmentManager = getSupportFragmentManager();
+        mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
         mFragmentTransaction.replace(R.id.fragmentReplacable, new MapViewFragment());
         mFragmentTransaction.commit();
@@ -67,7 +70,10 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_lane) {
 
         } else if (id == R.id.nav_measurement) {
-
+            mFragmentManager = getSupportFragmentManager();
+            mFragmentTransaction = mFragmentManager.beginTransaction();
+            mFragmentTransaction.replace(R.id.fragmentReplacable, new MapViewFragment());
+            mFragmentTransaction.commit();
         } else if (id == R.id.nav_statistics) {
 
         }
@@ -75,5 +81,13 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+
+
+    }
+
+    public void changeActivity(View view)
+    {
+        Intent intent = new Intent(MainActivity.this, MeasurementActivity.class);
+        startActivity(intent);
     }
 }

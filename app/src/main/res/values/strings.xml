@@ -5,4 +5,10 @@
     <string name="nav_header_title">Forgalomszámlálás</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="lane">Sáv kiválasztása</string>
+    <string name="juction_type">Csomópont típusa</string>
+    <string name="junction_name">Csomópont neve</string>
+    <string name="car">Autó</string>
+    <string name="trunk">Teherautó</string>
+    <string name="bus">Busz</string>
 </resources>
