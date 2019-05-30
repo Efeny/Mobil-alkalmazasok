@@ -1,5 +1,6 @@
 package com.example.traffic;
 
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.media.Image;
@@ -24,18 +25,27 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
+import database.LocationDatabase;
+import database.LocationDbObject;
+
 /**
  * A fragment_measurement that launches other parts of the demo application.
  */
-public class MapViewFragment extends Fragment implements OnMapReadyCallback {
+public class MapViewFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, View.OnClickListener {
 
     MapView mMapView;
     private GoogleMap googleMap;
     View mView;
     Button buttonMeasurement;
+    boolean markerIsAssigned=false;
+    final ArrayList<LocationDbObject> locationDbObjects = new ArrayList<>();
+    String markerTexT;
 
     double latitude;
     double longitude;
+    LocationDatabase db;
     // create marker
     MarkerOptions marker;
 
@@ -48,6 +58,19 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         mMapView.onCreate(savedInstanceState);
 
         mMapView.onResume();// needed to get the map to display immediately
+
+        buttonMeasurement = mView.findViewById(R.id.buttonMeasurement);
+        buttonMeasurement.setOnClickListener(this);
+        db = Room.databaseBuilder(getActivity().getApplicationContext(),
+                LocationDatabase.class, "database-name").build();
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                locationDbObjects.addAll((ArrayList) db.locationDAO().getAll());
+            }
+        });
+        thread.start();
 
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
@@ -62,6 +85,16 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         // Perform any camera updates here
         return mView;
 
+    }
+
+    private void addMarkers() {
+        MarkerOptions markerOptions=new MarkerOptions();
+        for (LocationDbObject item: locationDbObjects
+             ) {
+            markerOptions.position(new LatLng(item.latitude,item.longitude));
+            markerOptions.title(item.name);
+            googleMap.addMarker(markerOptions);
+        }
     }
 
     @Override
@@ -104,7 +137,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
        // marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
 
         googleMap = map;
-
+        addMarkers();
+        googleMap.setOnMarkerClickListener(this);
         /*for (int i=0; i<=jf.markerList.size();i++){
             map.addMarker(jf.markerList.get(i));
         }*/
@@ -152,32 +186,28 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
     public void startMeasurement(View mView)
     {
-        final String[] markerTexT = new String[1];
-        MainActivity main=new MainActivity();
-        final boolean markerIsAssigned=false;
-        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                markerTexT[0] =(marker.getTitle().toString());
-                return markerIsAssigned==true;
-            }
-        });
-        if(markerIsAssigned==false)
-        {
-            buttonMeasurement = mView.findViewById(R.id.buttonMeasurement);
-            buttonMeasurement.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Context context = getActivity().getApplicationContext();
-                    CharSequence text = "Hely kiválasztása kötelező!";
-                    int duration = Toast.LENGTH_SHORT;
 
-                    Toast.makeText(context, text, duration).show();
-                }
-            });
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+
+        markerTexT =(marker.getTitle().toString());
+        markerIsAssigned=true;
+        return false;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (markerIsAssigned==false) {
+            Context context = getActivity().getApplicationContext();
+            CharSequence text = "Hely kiválasztása kötelező!";
+            int duration = Toast.LENGTH_SHORT;
+            Toast.makeText(context, text, duration).show();
         }
-        else{
-            main.changeActivity(mView);
+        else {
+            MainActivity main=(MainActivity) getActivity();
+            main.changeActivity(markerTexT);
         }
     }
 }

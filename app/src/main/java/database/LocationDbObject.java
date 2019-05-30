@@ -10,20 +10,20 @@ public class LocationDbObject {
     public int id;
 
     @ColumnInfo(name = "name")
-    public String firstName;
+    public String name;
 
     @ColumnInfo(name = "address")
-    public String lastName;
+    public String address;
 
     @ColumnInfo(name = "latitude")
-    public long latitude;
+    public double latitude;
 
     @ColumnInfo(name = "longitude")
-    public long longitude;
+    public double longitude;
 
-    public LocationDbObject(String firstName, String lastName, long latitude, long longitude) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public LocationDbObject(String name, String address, double latitude, double longitude) {
+        this.name = name;
+        this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
     }

@@ -97,9 +97,10 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public void changeActivity(View view)
+    public void changeActivity(String junctionName)
     {
         Intent intent = new Intent(MainActivity.this, MeasurementActivity.class);
+        intent.putExtra("junctionName",junctionName);
         startActivity(intent);
     }
 }

@@ -16,8 +16,11 @@ public interface LocationDAO {
     @Query("SELECT * FROM locationDbObject WHERE id IN (:userIds)")
     List<LocationDbObject> loadAllByIds(int[] userIds);
 
-    @Query("SELECT * FROM locationDbObject WHERE name LIKE :first LIMIT 1")
-    LocationDbObject findByName(String first);
+    @Query("SELECT * FROM locationDbObject WHERE name LIKE :name LIMIT 1")
+    LocationDbObject findByName(String name);
+
+    @Insert
+    void insert(LocationDbObject dbObject);
 
     @Insert
     void insertAll(ArrayList<LocationDbObject> locations);

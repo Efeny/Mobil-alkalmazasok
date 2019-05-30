@@ -1,20 +1,23 @@
 package com.example.traffic;
 
-import android.app.AlertDialog;
-import android.content.Intent;
+import android.arch.persistence.room.Room;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
+import android.widget.TextView;
 
-import java.util.Locale;
+import java.util.ArrayList;
+
+import database.LocationDatabase;
+import database.LocationDbObject;
 
 public class MeasurementActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    private Spinner spinner;
+    LocationDatabase db;
+    private Spinner laneNumberSpinner,junctionTypeSpinner;
     private static final String[] paths = {"Sáv kiválasztása", "item 2", "item 3"};
 
     protected void onCreate(Bundle savedInstanceState)
@@ -22,22 +25,24 @@ public class MeasurementActivity extends AppCompatActivity implements AdapterVie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.measurement_activity_main);
 
-        spinner = (Spinner)findViewById(R.id.laneID);
+        TextView junctionName = findViewById(R.id.junctionName);
+        junctionName.setText(getIntent().getStringExtra("junctionName"));
+        laneNumberSpinner = (Spinner)findViewById(R.id.laneID);
         ArrayAdapter<String>adapter = new ArrayAdapter<String>(MeasurementActivity.this,
-                R.layout.measurement_activity_main,paths);
+                R.layout.spinner_layout,paths);
 
         adapter.setDropDownViewResource(R.layout.measurement_activity_main);
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(this);
+        laneNumberSpinner.setAdapter(adapter);
+        laneNumberSpinner.setOnItemSelectedListener(this);
 
 
-        spinner = (Spinner)findViewById(R.id.junctionType);
+        junctionTypeSpinner = (Spinner)findViewById(R.id.junctionType);
         adapter = new ArrayAdapter<String>(MeasurementActivity.this,
-                R.layout.measurement_activity_main,paths);
+                R.layout.spinner_layout,paths);
 
         adapter.setDropDownViewResource(R.layout.measurement_activity_main);
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(this);
+        junctionTypeSpinner.setAdapter(adapter);
+        junctionTypeSpinner.setOnItemSelectedListener(this);
 
     }
 

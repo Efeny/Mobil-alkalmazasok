@@ -82,9 +82,12 @@ public class JunctionFragment extends Fragment implements OnMapReadyCallback {
 }
 */
 
+import android.arch.persistence.room.Room;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -93,6 +96,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment;
@@ -115,6 +119,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import database.LocationDatabase;
+import database.LocationDbObject;
+
 public class JunctionFragment extends Fragment implements OnMapReadyCallback {
     MapView mMapView;
     private GoogleMap mMap;
@@ -123,6 +130,7 @@ public class JunctionFragment extends Fragment implements OnMapReadyCallback {
     View mView;
     List<MarkerOptions> markerList= new ArrayList<MarkerOptions>();
     String TAG = this.getClass().toString();
+    LocationDatabase db;
 
     @Nullable
     @Override
@@ -130,6 +138,8 @@ public class JunctionFragment extends Fragment implements OnMapReadyCallback {
         mView = inflater.inflate(R.layout.fragment_junction, container, false);
         mMapView = mView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
+        db = Room.databaseBuilder(getActivity().getApplicationContext(),
+                LocationDatabase.class, "database-name").build();
 
         try {
             ApplicationInfo ai = getActivity().getPackageManager().getApplicationInfo(getActivity().getPackageName(), PackageManager.GET_META_DATA);
@@ -174,6 +184,7 @@ public class JunctionFragment extends Fragment implements OnMapReadyCallback {
 
 
     public void AddPlace(Place place, int pno) {
+        final Place threadPlace = place;
         txt=mView.findViewById(R.id.txtInfo);
         try {
             if (mMap == null) {
@@ -187,6 +198,13 @@ public class JunctionFragment extends Fragment implements OnMapReadyCallback {
 
                 markerList.add(new MarkerOptions().position(place.getLatLng()));
 
+                Thread thread = new Thread() {
+                    @Override
+                    public void run() {
+                            db.locationDAO().insert(new LocationDbObject(threadPlace.getName(),threadPlace.getAddress(),threadPlace.getLatLng().latitude,threadPlace.getLatLng().longitude));
+                    }
+                };
+                thread.start();
                 txt.setText("Name:" + place.getName() + "\nAddress:" + place.getAddress());
 
             }
