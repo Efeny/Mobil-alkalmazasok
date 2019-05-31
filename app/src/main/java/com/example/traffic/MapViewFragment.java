@@ -53,11 +53,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Goo
         mView = inflater.inflate(R.layout.fragment_start, container,false);
         mMapView = mView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
-
-        mMapView.onResume();// needed to get the map to display immediately
-
-        buttonMeasurement = mView.findViewById(R.id.buttonMeasurement);
-        buttonMeasurement.setOnClickListener(this);
         db = Room.databaseBuilder(getActivity().getApplicationContext(),
                 Timestamp.class, "database-name").build();
 
@@ -68,6 +63,11 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Goo
             }
         });
         thread.start();
+        //mMapView.onResume();// needed to get the map to display immediately
+
+        buttonMeasurement = mView.findViewById(R.id.buttonMeasurement);
+        buttonMeasurement.setOnClickListener(this);
+
 
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
