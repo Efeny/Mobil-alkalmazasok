@@ -7,4 +7,6 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="measurement_marginButton">40dp</dimen>
     <dimen name="measurement_marginTextView">30dp</dimen>
+    <dimen name="measurement_marginSpinnerStart">20dp</dimen>
+    <dimen name="measurement_marginSpinnerEnd">10dp</dimen>
 </resources>

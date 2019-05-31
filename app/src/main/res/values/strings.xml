@@ -9,6 +9,6 @@
     <string name="juction_type">Csomópont típusa</string>
     <string name="junction_name">Csomópont neve</string>
     <string name="car">Autó</string>
-    <string name="trunk">Teherautó</string>
+    <string name="truck">Teherautó</string>
     <string name="bus">Busz</string>
 </resources>

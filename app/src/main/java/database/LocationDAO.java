@@ -28,3 +28,4 @@ public interface LocationDAO {
     @Delete
     void delete(LocationDbObject location);
 }
+

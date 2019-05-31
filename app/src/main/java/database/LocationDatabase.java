@@ -7,3 +7,4 @@ import android.arch.persistence.room.Database;
 public abstract class LocationDatabase extends RoomDatabase {
     public abstract LocationDAO locationDAO();
 }
+

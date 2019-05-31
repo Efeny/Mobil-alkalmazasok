@@ -20,7 +20,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
- * A fragment_measurement that launches other parts of the demo application.
+ * A fragment_start that launches other parts of the demo application.
  */
 public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 

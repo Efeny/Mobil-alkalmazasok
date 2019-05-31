@@ -21,6 +21,7 @@ public class LocationDbObject {
     @ColumnInfo(name = "longitude")
     public double longitude;
 
+
     public LocationDbObject(String name, String address, double latitude, double longitude) {
         this.name = name;
         this.address = address;

@@ -2,8 +2,6 @@ package com.example.traffic;
 
 import android.arch.persistence.room.Room;
 import android.content.Context;
-import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,13 +11,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -31,7 +27,7 @@ import database.LocationDatabase;
 import database.LocationDbObject;
 
 /**
- * A fragment_measurement that launches other parts of the demo application.
+ * A fragment_start that launches other parts of the demo application.
  */
 public class MapViewFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, View.OnClickListener {
 
@@ -53,7 +49,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Goo
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // inflat and return the layout
-        mView = inflater.inflate(R.layout.fragment_measurement, container,false);
+        mView = inflater.inflate(R.layout.fragment_start, container,false);
         mMapView = mView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
 
