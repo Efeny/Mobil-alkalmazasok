@@ -15,6 +15,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
@@ -27,7 +29,7 @@ import database.TimestampDbObject;
 public class MeasurementActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     LocationDatabase locationDB;
-    Timestamp timestampDB;
+    Timestamp db;
     TimestampDbObject timestampDbObject;
     private Spinner laneNumberSpinner,junctionTypeSpinner;
     private static final String[] lanes = {"Sáv 1", "Sáv 2", "Sáv 3"};
@@ -37,8 +39,10 @@ public class MeasurementActivity extends AppCompatActivity implements AdapterVie
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_measurement);
+        db = Room.databaseBuilder(getApplicationContext(),
+                Timestamp.class, "database-name").build();
 
-        TextView junctionName = findViewById(R.id.junctionName);
+        final TextView junctionName = findViewById(R.id.junctionName);
         junctionName.setText(getIntent().getStringExtra("junctionName"));
         laneNumberSpinner = (Spinner)findViewById(R.id.laneID);
         ArrayAdapter<String>adapter = new ArrayAdapter<String>(this,
@@ -64,10 +68,24 @@ public class MeasurementActivity extends AppCompatActivity implements AdapterVie
                 Long tsLong = System.currentTimeMillis()/1000;
                 String ts = tsLong.toString();
 
-                Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+                final Calendar cal = Calendar.getInstance(Locale.ENGLISH);
                 cal.setTimeInMillis(tsLong*1000);
-                String date = DateFormat.format("yyyy-MM-dd hh-mm-ss", cal).toString();
-                timestampDB.timestampDAO().insert(tsLong);
+                final String date = DateFormat.format("yyyy-MM-dd hh-mm-ss", cal).toString();
+                Thread thread = new Thread() {
+                    @Override
+                    public void run() {
+                        if(db == null){
+                            db  = Room.databaseBuilder(getApplicationContext(),
+                                    Timestamp.class, "database-name").build();
+                        }
+                        java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());
+                        timestampDbObject = new TimestampDbObject(db.locationDAO().findByName(junctionName.getText().toString()).id, sqlDate,"car");
+                        db.timestampDAO().insertTimestamp(timestampDbObject);
+                    }
+                };
+                thread.start();
+
+
 
                 Context context = getApplicationContext();
                 CharSequence text = date;

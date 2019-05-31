@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 import database.LocationDatabase;
 import database.LocationDbObject;
+import database.Timestamp;
 
 /**
  * A fragment_start that launches other parts of the demo application.
@@ -41,14 +42,14 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Goo
 
     double latitude;
     double longitude;
-    LocationDatabase db;
+    Timestamp db;
     // create marker
     MarkerOptions marker;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // inflat and return the layout
+        // inflate and return the layout
         mView = inflater.inflate(R.layout.fragment_start, container,false);
         mMapView = mView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
@@ -58,12 +59,12 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Goo
         buttonMeasurement = mView.findViewById(R.id.buttonMeasurement);
         buttonMeasurement.setOnClickListener(this);
         db = Room.databaseBuilder(getActivity().getApplicationContext(),
-                LocationDatabase.class, "database-name").build();
+                Timestamp.class, "database-name").build();
 
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                locationDbObjects.addAll((ArrayList) db.locationDAO().getAll());
+                locationDbObjects.addAll(db.locationDAO().getAll());
             }
         });
         thread.start();

@@ -121,6 +121,7 @@ import java.util.List;
 
 import database.LocationDatabase;
 import database.LocationDbObject;
+import database.Timestamp;
 
 public class JunctionFragment extends Fragment implements OnMapReadyCallback {
     MapView mMapView;
@@ -130,7 +131,7 @@ public class JunctionFragment extends Fragment implements OnMapReadyCallback {
     View mView;
     List<MarkerOptions> markerList= new ArrayList<MarkerOptions>();
     String TAG = this.getClass().toString();
-    LocationDatabase db;
+    Timestamp db;
 
     @Nullable
     @Override
@@ -139,7 +140,7 @@ public class JunctionFragment extends Fragment implements OnMapReadyCallback {
         mMapView = mView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
         db = Room.databaseBuilder(getActivity().getApplicationContext(),
-                LocationDatabase.class, "database-name").build();
+                Timestamp.class, "database-name").build();
 
         try {
             ApplicationInfo ai = getActivity().getPackageManager().getApplicationInfo(getActivity().getPackageName(), PackageManager.GET_META_DATA);
