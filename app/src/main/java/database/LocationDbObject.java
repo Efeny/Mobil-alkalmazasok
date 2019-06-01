@@ -4,6 +4,9 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
+/**
+ * Class that represents the LOCATION table in the database.
+ */
 @Entity
 public class LocationDbObject {
     @PrimaryKey(autoGenerate = true)

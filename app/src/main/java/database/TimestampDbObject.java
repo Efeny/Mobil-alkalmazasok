@@ -11,7 +11,11 @@ import java.sql.Timestamp;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
-
+/**
+ * Class that represents the TIMESTAMP table in the database.
+ * The class has a foreign key from the LOCATION table, to connect junctions to their
+ * recorded measurements.
+ */
 @Entity(foreignKeys = @ForeignKey(entity = LocationDbObject.class,
         parentColumns = "id",
         childColumns = "locationId",

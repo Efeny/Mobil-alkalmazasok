@@ -13,21 +13,10 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
 
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.net.PlacesClient;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import database.LocationDAO;
-import database.LocationDatabase;
-import database.LocationDbObject;
-
-
+/**
+ * The main activity, which handles a drawerlayout and holds the junction and mapview fragments.
+ */
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -39,6 +28,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Creating the new fragment to replace the layout at R.id.fragmentReplacable
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
         mFragmentTransaction.replace(R.id.fragmentReplacable, new MapViewFragment());
@@ -68,6 +58,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * The method handles fragment swapping based on the selected menu item in the drawer.
+     * @param item The item that was selected from the menu
+     * @return
+     */
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -90,13 +85,19 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+        //Closing the drawer after the click has been registered
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
 
-
     }
 
+    /**
+     * The method creates a new activity intent based on the name of the junction that is
+     * currently selected in the mMap object. Launches the new activity after setting extra properties.
+     * @param junctionName The name of the junction, which will be passed to the new activity
+     *                     through the Intent object.
+     */
     public void changeActivity(String junctionName)
     {
         Intent intent = new Intent(MainActivity.this, MeasurementActivity.class);

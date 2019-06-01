@@ -15,20 +15,20 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.sql.Date;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
-import database.LocationDatabase;
-import database.LocationDbObject;
 import database.Timestamp;
 import database.TimestampDbObject;
 
+/**
+ * The activity used to record every vehicle type that passes in a specified lane and junction.
+ */
 public class MeasurementActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener {
 
-    LocationDatabase locationDB;
+    /**
+     * Timestamp object represents the SQLite database
+     */
     Timestamp db;
     TimestampDbObject timestampDbObject;
     private Spinner laneNumberSpinner,junctionTypeSpinner;
@@ -36,6 +36,11 @@ public class MeasurementActivity extends AppCompatActivity implements AdapterVie
     private static final String[] lanes = {"Sáv 1", "Sáv 2", "Sáv 3"};
     private static final String[] juncType = {"lámpás útkereszteződés", "körforgalom"};
 
+    /**
+     * Setting up UI elements with adapters for the spinners, and
+     * clicklisteners for the clickable buttons.
+     * @param savedInstanceState
+     */
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -72,13 +77,14 @@ public class MeasurementActivity extends AppCompatActivity implements AdapterVie
     }
 
     /**
-     *
-     * @param v
+     * Method that handles the three types of Clicks that could appear on this activity.
+     * Creates a new TimestampDbObject, based on the name of the junction, the current date
+     * and the type of vehicle.
+     * @param v View parameter used to determine which button was pressed
      */
     @Override
     public void onClick(View v) {
         Long tsLong = System.currentTimeMillis()/1000;
-
         final Calendar cal = Calendar.getInstance(Locale.ENGLISH);
         cal.setTimeInMillis(tsLong*1000);
         final String date = DateFormat.format("yyyy-MM-dd hh-mm-ss", cal).toString();
@@ -109,6 +115,7 @@ public class MeasurementActivity extends AppCompatActivity implements AdapterVie
         };
         thread.start();
 
+        //Letting the user know that the click was registered
         int duration = Toast.LENGTH_SHORT;
         Toast.makeText(this, date, duration).show();
     }

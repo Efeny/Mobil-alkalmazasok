@@ -23,12 +23,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
-import database.LocationDatabase;
 import database.LocationDbObject;
 import database.Timestamp;
 
 /**
- * A fragment_start that launches other parts of the demo application.
+ * Initial fragment when launching the activity. Shows the available locations for measurements, currently stored in the database
  */
 public class MapViewFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, View.OnClickListener {
 
@@ -39,12 +38,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Goo
     boolean markerIsAssigned=false;
     final ArrayList<LocationDbObject> locationDbObjects = new ArrayList<>();
     String markerTexT;
-
-    double latitude;
-    double longitude;
     Timestamp db;
-    // create marker
-    MarkerOptions marker;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,9 +48,11 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Goo
         mView = inflater.inflate(R.layout.fragment_start, container,false);
         mMapView = mView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
+        //Initialize the database in the fragments instance
         db = Room.databaseBuilder(getActivity().getApplicationContext(),
                 Timestamp.class, "database-name").build();
 
+        // Adding every element from the database into the locationDbObjects ArrayList
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -63,27 +60,26 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Goo
             }
         });
         thread.start();
-        //mMapView.onResume();// needed to get the map to display immediately
 
         buttonMeasurement = mView.findViewById(R.id.buttonMeasurement);
         buttonMeasurement.setOnClickListener(this);
 
-
+        // Setting up google maps
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        // Starting the google map object acquisition
         mMapView.getMapAsync(this);
-        //SupportMapFragment mapFragment = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.frag));
-        //mapFragment.getMapAsync(this);
-
-        // Perform any camera updates here
         return mView;
 
     }
 
+    /**
+     * Method that adds every marker to the returned googleMap object.
+     */
     private void addMarkers() {
         MarkerOptions markerOptions=new MarkerOptions();
         for (LocationDbObject item: locationDbObjects
@@ -118,82 +114,44 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Goo
         mMapView.onLowMemory();
     }
 
+    /**
+     * Receives the object and sets up basic UI properties and adds markers
+     * @param map A GoogleMap object
+     */
     @Override
     public void onMapReady(GoogleMap map) {
-        JunctionFragment jf=new JunctionFragment();
-        TextView txt=mView.findViewById(R.id.txtInfo);
-        //DO WHATEVER YOU WANT WITH GOOGLEMAP
-        // latitude and longitude
-        //double latitude = 47.187104;
-        //double longitude = 18.412595;
-
-        // create marker
-        //MarkerOptions marker = new MarkerOptions().position(new LatLng(latitude, longitude)).title("Hello Maps");
-
-        // Changing marker icon
-       // marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-
         googleMap = map;
         addMarkers();
         googleMap.setOnMarkerClickListener(this);
-        /*for (int i=0; i<=jf.markerList.size();i++){
-            map.addMarker(jf.markerList.get(i));
-        }*/
 
-
-        // adding marker
-       // googleMap.addMarker(marker);
         CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(47.187104, 18.412595)).zoom(12).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        //map.setMyLocationEnabled(true);
         googleMap.setTrafficEnabled(false);
         googleMap.setIndoorEnabled(true);
         googleMap.setBuildingsEnabled(true);
         googleMap.getUiSettings().setZoomControlsEnabled(true);
-        // Setting a click event handler for the map
-        googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-
-            @Override
-            public void onMapLongClick(LatLng latLng) {
-
-                // Creating a marker
-                MarkerOptions markerOptions = new MarkerOptions();
-
-                // Setting the position for the marker
-                markerOptions.position(latLng);
-
-                // Setting the title for the marker.
-                // This will be displayed on taping the marker
-                markerOptions.title(latLng.latitude + " : " + latLng.longitude);
-
-                // Clears the previously touched position
-                //googleMap.clear();
-
-                // Animating to the touched position
-                //googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-
-                // Placing a marker on the touched position
-                googleMap.addMarker(markerOptions);
-                startMeasurement(mView);
-            }
-        });
     }
 
-
-    public void startMeasurement(View mView)
-    {
-
-    }
-
+    /**
+     * Stores the title of the created marker, and enables measurements to take place at the specified junction
+     * @param marker The Marker object, that fired the onMarkerClick event
+     * @return
+     */
     @Override
     public boolean onMarkerClick(Marker marker) {
 
-        markerTexT =(marker.getTitle().toString());
+        markerTexT =(marker.getTitle());
         markerIsAssigned=true;
         return false;
     }
 
+    /**
+     * Method that starts the measurement activity, or tells the user
+     * to select a junction from the map.
+     * @param v View that contains which button was clicked
+     *          (currently not handled, because only a single button would fire this event).
+     */
     @Override
     public void onClick(View v) {
         if (markerIsAssigned==false) {
