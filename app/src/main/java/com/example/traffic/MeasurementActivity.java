@@ -32,7 +32,7 @@ public class MeasurementActivity extends AppCompatActivity implements AdapterVie
     Timestamp db;
     TimestampDbObject timestampDbObject;
     private Spinner laneNumberSpinner,junctionTypeSpinner;
-    final String junctionNameString=getIntent().getStringExtra("junctionName");
+    String junctionNameString;
     private static final String[] lanes = {"Sáv 1", "Sáv 2", "Sáv 3"};
     private static final String[] juncType = {"lámpás útkereszteződés", "körforgalom"};
 
@@ -40,6 +40,7 @@ public class MeasurementActivity extends AppCompatActivity implements AdapterVie
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_measurement);
+        junctionNameString = getIntent().getStringExtra("junctionName");
         db = Room.databaseBuilder(getApplicationContext(),
                 Timestamp.class, "database-name").build();
 
@@ -70,10 +71,13 @@ public class MeasurementActivity extends AppCompatActivity implements AdapterVie
         busBtn.setOnClickListener(this);
     }
 
+    /**
+     *
+     * @param v
+     */
     @Override
     public void onClick(View v) {
         Long tsLong = System.currentTimeMillis()/1000;
-        String ts = tsLong.toString();
 
         final Calendar cal = Calendar.getInstance(Locale.ENGLISH);
         cal.setTimeInMillis(tsLong*1000);
@@ -105,10 +109,8 @@ public class MeasurementActivity extends AppCompatActivity implements AdapterVie
         };
         thread.start();
 
-        Context context = getApplicationContext();
-        CharSequence text = date;
         int duration = Toast.LENGTH_SHORT;
-        Toast.makeText(context, text, duration).show();
+        Toast.makeText(this, date, duration).show();
     }
 
 
