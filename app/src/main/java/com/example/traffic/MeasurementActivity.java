@@ -26,12 +26,13 @@ import database.LocationDbObject;
 import database.Timestamp;
 import database.TimestampDbObject;
 
-public class MeasurementActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class MeasurementActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener {
 
     LocationDatabase locationDB;
     Timestamp db;
     TimestampDbObject timestampDbObject;
     private Spinner laneNumberSpinner,junctionTypeSpinner;
+    final String junctionNameString=getIntent().getStringExtra("junctionName");
     private static final String[] lanes = {"Sáv 1", "Sáv 2", "Sáv 3"};
     private static final String[] juncType = {"lámpás útkereszteződés", "körforgalom"};
 
@@ -43,7 +44,7 @@ public class MeasurementActivity extends AppCompatActivity implements AdapterVie
                 Timestamp.class, "database-name").build();
 
         final TextView junctionName = findViewById(R.id.junctionName);
-        junctionName.setText(getIntent().getStringExtra("junctionName"));
+        junctionName.setText(junctionNameString);
         laneNumberSpinner = (Spinner)findViewById(R.id.laneID);
         ArrayAdapter<String>adapter = new ArrayAdapter<String>(this,
                 R.layout.spinner_layout,lanes);
@@ -62,42 +63,54 @@ public class MeasurementActivity extends AppCompatActivity implements AdapterVie
         junctionTypeSpinner.setOnItemSelectedListener(this);
 
         Button carBtn=findViewById(R.id.carButton);
-        carBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Long tsLong = System.currentTimeMillis()/1000;
-                String ts = tsLong.toString();
-
-                final Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-                cal.setTimeInMillis(tsLong*1000);
-                final String date = DateFormat.format("yyyy-MM-dd hh-mm-ss", cal).toString();
-                Thread thread = new Thread() {
-                    @Override
-                    public void run() {
-                        if(db == null){
-                            db  = Room.databaseBuilder(getApplicationContext(),
-                                    Timestamp.class, "database-name").build();
-                        }
-                        java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());
-                        timestampDbObject = new TimestampDbObject(db.locationDAO().findByName(junctionName.getText().toString()).id, sqlDate,"car");
-                        db.timestampDAO().insertTimestamp(timestampDbObject);
-                    }
-                };
-                thread.start();
-
-
-
-                Context context = getApplicationContext();
-                CharSequence text = date;
-                int duration = Toast.LENGTH_SHORT;
-                Toast.makeText(context, text, duration).show();
-
-            }
-        });
-
-
-
+        Button truckBtn=findViewById(R.id.truckButton);
+        Button busBtn=findViewById(R.id.busButton);
+        carBtn.setOnClickListener(this);
+        truckBtn.setOnClickListener(this);
+        busBtn.setOnClickListener(this);
     }
+
+    @Override
+    public void onClick(View v) {
+        Long tsLong = System.currentTimeMillis()/1000;
+        String ts = tsLong.toString();
+
+        final Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+        cal.setTimeInMillis(tsLong*1000);
+        final String date = DateFormat.format("yyyy-MM-dd hh-mm-ss", cal).toString();
+        final String vehicleType;
+        if (v.getId()==R.id.carButton)
+        {
+            vehicleType="car";
+        }
+        else if(v.getId()==R.id.truckButton)
+        {
+            vehicleType="truck";
+        }
+        else
+        {
+            vehicleType="bus";
+        }
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                if(db == null){
+                    db  = Room.databaseBuilder(getApplicationContext(),
+                            Timestamp.class, "database-name").build();
+                }
+                java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());
+                timestampDbObject = new TimestampDbObject(db.locationDAO().findByName(junctionNameString).id, sqlDate,vehicleType);
+                db.timestampDAO().insertTimestamp(timestampDbObject);
+            }
+        };
+        thread.start();
+
+        Context context = getApplicationContext();
+        CharSequence text = date;
+        int duration = Toast.LENGTH_SHORT;
+        Toast.makeText(context, text, duration).show();
+    }
+
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
